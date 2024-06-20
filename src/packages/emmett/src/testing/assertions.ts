@@ -37,6 +37,21 @@ export const assertThrows = (
   }
 };
 
+export const assertRejects = async <T, TError extends Error = Error>(
+  promise: Promise<T>,
+  errorCheck?: ((error: TError) => boolean) | TError,
+) => {
+  try {
+    await promise;
+    throw new AssertionError("Function didn't throw expected error");
+  } catch (error) {
+    if (!errorCheck) return;
+
+    if (errorCheck instanceof Error) assertDeepEqual(error, errorCheck);
+    else assertTrue(errorCheck(error as TError));
+  }
+};
+
 export const assertMatches = (
   actual: unknown,
   expected: unknown,
