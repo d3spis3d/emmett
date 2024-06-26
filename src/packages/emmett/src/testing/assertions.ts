@@ -6,6 +6,14 @@ export class AssertionError extends Error {
     super(message);
   }
 }
+
+const stringify = (obj: unknown) =>
+  JSON.stringify(
+    obj,
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    (_, value) => (typeof value === 'bigint' ? value.toString() : value),
+  );
+
 export const isSubset = (superObj: unknown, subObj: unknown): boolean => {
   const sup = superObj as DefaultRecord;
   const sub = subObj as DefaultRecord;
@@ -60,7 +68,7 @@ export const assertMatches = (
   if (!isSubset(actual, expected))
     throw new AssertionError(
       message ??
-        `subObj:\n${JSON.stringify(expected)}\nis not subset of\n${JSON.stringify(actual)}`,
+        `subObj:\n${stringify(expected)}\nis not subset of\n${stringify(actual)}`,
     );
 };
 
@@ -72,7 +80,7 @@ export const assertDeepEqual = (
   if (!deepEquals(actual, expected))
     throw new AssertionError(
       message ??
-        `subObj:\n${JSON.stringify(expected)}\nis equals to\n${JSON.stringify(actual)}`,
+        `Expected:\n${stringify(expected)}\nis not equal to\n${stringify(actual)}`,
     );
 };
 
@@ -111,7 +119,7 @@ export function assertEqual<T>(
   if (obj !== other)
     throw new AssertionError(
       message ??
-        `Objects are not equal:\n ${JSON.stringify(obj)}\ncompared:\n${JSON.stringify(other)}`,
+        `Objects are not equal:\n ${stringify(obj)}\ncompared:\n${stringify(other)}`,
     );
 }
 
@@ -121,9 +129,7 @@ export function assertNotEqual<T>(
   message?: string,
 ): void {
   if (obj === other)
-    throw new AssertionError(
-      message ?? `Objects are equal: ${JSON.stringify(obj)}`,
-    );
+    throw new AssertionError(message ?? `Objects are equal: ${stringify(obj)}`);
 }
 
 export function assertIsNotNull<T extends object>(
