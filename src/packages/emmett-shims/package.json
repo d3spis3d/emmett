@@ -1,8 +1,8 @@
 {
-  "name": "@event-driven-io/emmett-fastify",
+  "name": "@event-driven-io/emmett-shims",
   "version": "0.11.2",
-  "description": "Emmett - Event Sourcing development made simple",
   "type": "module",
+  "description": "Emmett - Event Sourcing development made simple",
   "scripts": {
     "build": "tsup",
     "build:ts": "tsc",
@@ -21,13 +21,9 @@
     "url": "git+https://github.com/event-driven-io/emmett.git"
   },
   "keywords": [
-    "Event Sourcing",
-    "Fastify"
+    "Event Sourcing"
   ],
   "author": "Oskar Dudycz",
-  "contributors": [
-    "Mateusz Kubaszek mkubasz@gmail.com"
-  ],
   "bugs": {
     "url": "https://github.com/event-driven-io/emmett/issues"
   },
@@ -50,14 +46,10 @@
   "files": [
     "dist"
   ],
-  "dependencies": {},
-  "devDependencies": {},
   "peerDependencies": {
-    "@event-driven-io/emmett": "^0.11.2",
-    "fastify": "4.26.2",
-    "@fastify/compress": "7.0.0",
-    "@fastify/etag": "5.1.0",
-    "@fastify/formbody": "7.4.0",
-    "close-with-grace": "1.3.0"
+    "web-streams-polyfill": "^4.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.11.30"
   }
 }

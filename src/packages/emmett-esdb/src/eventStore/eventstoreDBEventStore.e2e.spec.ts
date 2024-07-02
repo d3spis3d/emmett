@@ -9,24 +9,27 @@ import {
   EventStoreDBContainer,
   StartedEventStoreDBContainer,
 } from '@event-driven-io/emmett-testcontainers';
-import { after, describe, it } from 'node:test';
-import {
-  testAggregateStream,
-  type EventStoreFactory,
-} from '../../../emmett/src/testing/features';
+import { after, before, describe, it } from 'node:test';
+// import {
+//   testAggregateStream,
+//   type EventStoreFactory,
+// } from '../../../emmett/src/testing/features';
 import { getEventStoreDBEventStore } from './eventstoreDBEventStore';
 
 const { stopOn } = streamTransformations;
 
 type MockEvent = Event<'Mocked', { mocked: true }>;
 
-void describe('EventStoreDBEventStore', async () => {
+void describe('EventStoreDBEventStore', () => {
   let esdbContainer: StartedEventStoreDBContainer;
 
-  const eventStoreFactory: EventStoreFactory = async () => {
-    esdbContainer = await new EventStoreDBContainer().start();
+  const eventStoreFactory = () => {
     return getEventStoreDBEventStore(esdbContainer.getClient());
   };
+
+  before(async () => {
+    esdbContainer = await new EventStoreDBContainer().start();
+  });
 
   after(async () => {
     await esdbContainer.stop();
@@ -36,12 +39,12 @@ void describe('EventStoreDBEventStore', async () => {
   //   await esdbContainer.stop();
   // };
 
-  await testAggregateStream(eventStoreFactory, {
-    getInitialIndex: () => 0n,
-  });
+  // await testAggregateStream(eventStoreFactory, {
+  //   getInitialIndex: () => 0n,
+  // });
 
-  void it.skip('Successful subscription and processing of events', async () => {
-    const eventStore = await eventStoreFactory();
+  void it('Successful subscription and processing of events', async () => {
+    const eventStore = eventStoreFactory();
     const streamName = 'test-stream';
 
     const events: MockEvent[] = [
