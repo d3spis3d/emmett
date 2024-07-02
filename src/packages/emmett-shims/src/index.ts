@@ -1,4 +1,44 @@
-import streamsPolyfill from 'web-streams-polyfill';
+import * as streamsPolyfill from 'web-streams-polyfill';
+
+let streams: typeof streamsPolyfill;
+
+if (
+  typeof globalThis !== 'undefined' &&
+  'WritableStream' in globalThis &&
+  'ReadableStream' in globalThis &&
+  'TransformStream' in globalThis
+) {
+  console.log('importing from browser');
+  streams = {
+    // @ts-expect-error global object check
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    WritableStream: globalThis.WritableStream,
+    // @ts-expect-error global object check
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    ReadableStream: globalThis.ReadableStream,
+    // @ts-expect-error global object check
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+    TransformStream: globalThis.TransformStream,
+  } as unknown as typeof streamsPolyfill;
+} else {
+  try {
+    console.log('importing from node');
+    const nodeJsStreams = await import('node:stream/web');
+    streams = {
+      WritableStream: nodeJsStreams.WritableStream,
+      ReadableStream: nodeJsStreams.ReadableStream,
+      TransformStream: nodeJsStreams.TransformStream,
+    } as unknown as typeof streamsPolyfill;
+  } catch {
+    console.log('falling back to polyfill');
+    streams = streamsPolyfill;
+  }
+}
+
+export default streams;
+
+// Use a type-only import/export to re-export all types
+export type * from 'web-streams-polyfill';
 
 // https://github.com/jsdom/jsdom/issues/1537#issuecomment-229405327
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
@@ -35,34 +75,6 @@ const isBun =
   process.versions.bun != null;
 
 export { isBrowser, isBun, isDeno, isJsDom, isNode, isWebWorker };
-
-let streams: typeof streamsPolyfill;
-
-if (
-  globalThis &&
-  // @ts-expect-error global object check
-  globalThis.WritableStream &&
-  // @ts-expect-error global object check
-  globalThis.ReadableStream &&
-  // @ts-expect-error global object check
-  globalThis.TransformStream
-) {
-  // @ts-expect-error global object check
-  streams = globalThis as typeof streamsPolyfill;
-} else {
-  try {
-    // @ts-expect-error global object check
-    streams = (await import('node:stream/web')) as typeof streamsPolyfill;
-  } catch {
-    // Just falling back to the default polyfill
-    streams = streamsPolyfill;
-  }
-}
-
-export default streams;
-
-// Use a type-only import/export to re-export all types
-export type * from 'web-streams-polyfill';
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 const isBrowser = (): boolean => {
